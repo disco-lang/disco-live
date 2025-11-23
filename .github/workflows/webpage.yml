@@ -1,0 +1,49 @@
+name: Build and Deploy to Github Page
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v12
+
+      - name: Configure Nix Cache (optional)
+        uses: DeterminateSystems/magic-nix-cache-action@v6
+
+      - name: Enter devShell and build
+        run: |
+          nix develop --command bash -c "
+            echo 'Entered Nix devShell'
+            wasm32-wasi-cabal update
+            ./build.sh && ./package.sh
+          "
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
