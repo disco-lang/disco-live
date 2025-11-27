@@ -23,6 +23,9 @@ foreign import javascript unsafe "$1.target.value"
 foreign import javascript unsafe "$1.value"
   js_input_value :: JSVal -> IO JSString
 
+foreign import javascript unsafe "view.state.doc.toString()"
+  js_view_state_doc_toString :: IO JSString
+
 foreign import javascript "$1.innerHTML = $2"
   js_element_setInnerHtml :: JSVal -> JSString -> IO ()
 
@@ -45,8 +48,7 @@ setup = do
 -- | Handle button clicks.
 onEvalButtonClick :: JSVal -> IO ()
 onEvalButtonClick event = do
-    exprInput  <- js_document_getElementById (toJSString "expr")
-    expr       <- fromJSString <$> js_input_value exprInput
+    expr       <- fromJSString <$> js_view_state_doc_toString
     
     let svg = eval expr
     outDiv     <- js_document_getElementById (toJSString "out")

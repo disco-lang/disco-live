@@ -6,13 +6,15 @@
 </head>
 
 <body>
-    <div>
-        <input type="text" id="expr"/>
-        <label for="expr">Expression</label>
-        <input type="button" id="eval" value="Evaluate"/>
+  <script defer src="vendor/codemirror-6.js"></script>
+  <script defer src="js/editor.js"></script>
+  <div>
+    <div id="editor">
     </div>
+    <input type="button" id="eval" value="Evaluate"/>
     <div id="out">
     </div>
-    <script type="module" src="runtime.js"></script>
+  </div>
+  <script type="module" src="runtime.js"></script>
 </body>
 </html>
