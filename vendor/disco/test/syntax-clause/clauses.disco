@@ -1,0 +1,17 @@
+-- An example of a function defined by pattern-matching clauses, with
+-- multiple clauses and multiple arguments.
+
+zipWithN : (N -> N -> N) -> List(N) -> List(N) -> List(N)
+zipWithN _ []        _         = []
+zipWithN _ _         []        = []
+zipWithN f (m :: ms) (n :: ns) = f m n :: zipWithN f ms ns
+
+-- Another example of a function defined by pattern-matching
+-- clauses. This one has the feature that it has the same name (ys) in
+-- two of the clauses, which was causing problems for the way we
+-- handle name resolution (the implementation of 'lunbinds' in
+-- Desugar.desugarDefn was wrong).
+
+appendC : List(ℕ) × List(ℕ) → List(ℕ)
+appendC ([]    , ys) = ys
+appendC (x::xs', ys) = x :: appendC(xs',ys)

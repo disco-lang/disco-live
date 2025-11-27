@@ -1,0 +1,28 @@
+0!
+1!
+2!
+3!
+4!
+5!
+100!
+1! + 2! + 3! + 4!
+0 choose 0
+4 choose 0
+4 choose 1
+4 choose 2
+4 choose 3
+4 choose 4
+4 choose 5
+1000 choose 256
+10 choose []
+10 choose [1]
+10 choose [2]
+10 choose [2] == 10 choose 2
+10 choose [2,8] == 10 choose 2
+10 choose [2,3,4]
+10 choose [2,3,2] == 10! / (2! * 3! * 2! * 3!)
+10 choose [2,3,5]
+10 choose [2,3,6]
+10 choose [1,1,1,1,1,1,1,1,1,1]
+let x = 3 in 5 choose x
+let x = [1,2,2] in 5 choose x

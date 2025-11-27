@@ -1,0 +1,11 @@
+stack.yaml.lock
+.stack-work/
+core-html/
+*~
+*.prof
+.ghc.environment.*
+dist-newstyle
+*.hi
+*.o
+/result
+/result-doc

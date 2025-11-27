@@ -1,0 +1,206 @@
+Game plan for *incrementally* generalizing operators.  Goals:
+
+- Support writing things like _+_ so operators parse as independent
+  terms, so they can be used as arguments to higher-order functions,
+  partially applied, etc.
+
+- Simplify representation & type checking so we no longer have special
+  TBin and TUn nodes, just application.
+
+- Ultimately I want to do this now (as opposed to waiting until later)
+  because I want to be able to define infix operators like 'union',
+  'intersection', etc. in a library (in terms of the 'merge' prim).
+
+I tried to do it all at once and failed; once I finally got it to
+compile there were tons of errors in the test suite etc. and I was
+completely at a loss as to what was going on.  This time I think I
+will try a more incremental approach, i.e. try to keep it building and
+passing tests as much as possible.
+
+- Leave TBin, TUn intact at first.
+- [X] Add operators as prims
+- [X] Add parsing rules for standalone operators & test parsing
+
+  Have to be very careful here, parsing is tricky!
+  - [X] Disallow underscores in normal variable names.
+  - [X] Try parsing each operator with underscores^H^H^H tildes in the appropriate places
+  - For now don't try parsing user-defined operator names; we can add
+    that later.
+
+  - OK, actually this really doesn't work well at all.  e.g.
+
+    not_
+
+    parses as an expression, consisting of the application of the
+    operator not to a wildcard.  This is part of the reason that Idris
+    requires spaces around operators!
+
+    Maybe we need a different syntax for argument slots....  maybe
+    tildes?  Don't currently use those for anything...
+
+    not~   ~+~  ~!  etc.  I think I like it.
+
+    OR if we wanted to be really radical we could use ~ as the wildcard
+    pattern, and _ for argument slots...
+
+    For now let's go with ~ for argument slots.  We can always change
+    it later pretty easily; this way we don't have to update all the
+    examples and tests that already use _ as a wildcard.
+
+    Note this means we can also re-allow _ in variable names.
+
+    OK, not~ still isn't parsing.  parseAtom successfully parses it;
+    the problem is that when parseExpr is called, it successfully
+    parses the 'not' as an operator and then tries to parse the ~ as
+    an expression. Maybe just add some 'notFollowedBy' nonsense to
+    operator parsing??  This is getting rather complicated.  But maybe
+    that's just how it is when you have infix operators.
+
+    Actually the fix was very easy: put ~ *back into* opChars, because
+    the only place opChars is used is in reservedOp, to make sure that
+    none of them come after a parsed operator name.
+
+    Prefix ops work now.  But infix don't yet.  Ah, just needed to add
+    some 'try', since it tried parsing ~+~ as some postfix thing and
+    consumed the ~.  Next step: improve it so it consumes ~ first and
+    then tries parsing either a postfix thing or an infix thing
+    followed by ~.
+- [X] fix parsing of e.g.   f ~and~
+  Parsing still doesn't completely work.  An application of something
+  to a standalone operator doesn't parse, e.g.  f ~and~ fails on the
+  first ~ and says it was expecting EOF, operator, or type annotation.
+
+  Ah, I think I know why --- the application space is parsed using
+  'reservedOp ""' which insists that no operator symbol follows it.
+  Yes, that was it, changing to 'string ""' fixed it.  reservedOp was
+  unnecessary.
+- [X] extend pretty-printer to deal with standalone operators
+- [X] Add typing rule for one standalone operator (e.g. _+_) and get
+  it to typecheck
+
+  - Actually the type of _+_ is a bit complicated.  Let's pick
+    something with an utterly simple type like 'and'.
+- [X] Add desugaring rules for _and_
+
+  Added desugaring, and it works. But it desugars to a lambda
+  containing ATBin And!  Ultimately this is backwards.
+
+  OK, got it straightened out now.  Pulled out a helper method to
+  avoid duplicate code while transitioning.
+- [X] Switch parsing of normal infix 'and' to produce TApp node
+- [X] special case for desugaring when and operator is fully applied, just
+  call desugarBinApp
+- [X] remove ATBin And case from desugarTerm
+- [X] remove ATBin And case from typecheck
+- [X] Try putting in special case for an operator that doesn't desugar
+  and has a simple type, say, factorial.  That will involve changing
+  stuff in compilation instead of desugaring.
+  - [X] typing rule
+  - [X] compilation rule
+  - [X] switch parsing
+  - [X] remove ATUn case from compile and typecheck
+  - [X] special case for compiling fully applied?
+    - not needed since it just compiles to a core function constant
+      anyway, not a lambda.
+
+  - Actually operators that only compile seem easy: I was already
+    simply compiling them to function constants.  It's just that this
+    won't fire for prim operators until they are parsed as
+    applications instead of TBin or TUn nodes.
+- [X] extend pretty-printer to display fully applied operators using
+  pre/post/infix notation
+- [X] next thing to try is a compiled operator with a more
+  interesting type, such as LT.
+
+  - fixJuxtMul is wreaking havoc with TApp nodes now that we are
+    generating more of them.  Potential solution: add explicit TJuxt
+    constructor for initial parsing.  Then fixJuxtMul resolves TJuxt
+    only (NOT TApp) into TApp or mul.
+
+  - (Holy ****, no WONDER I was running into so many issues before!
+    This incremental approach is really paying off.)
+
+  - OK, parsing is turning out to be a real bear.  Idea: don't change
+    parsing at all, which will still have TUn and TBin.  They are
+    really helpful in dealing with juxtaposed multiplication,
+    fixing precedence, and so on.  Then as a phase right before/during
+    *typechecking*, expand TUn and TBin into (nested) TApp.
+
+    Yes!  This works great!  And it seems much simpler too.
+
+- Then convert other operators!
+  - [X] logic operators: and, impl, or, not
+  - [X] sqrt, lg
+  - [X] floor, ceil
+    - Note that we totally could give these a type as operators, by
+      making up a fresh type variable for their input and generating
+      constraints via the cInt function. BUT if we do this, we lose
+      the ability to avoid generating constraints when we already
+      statically know the input type.  We should be able to do
+      something a bit more clever.  Perhaps leave in the TBin case
+      mostly as it is now.
+
+      We want to avoid duplicating code: we will need to be able to
+      assign a type to standalone versions of these operators too.
+
+      Maybe write functions which check the type of such operators,
+      and takes argument types as parameters; can generate fresh types
+      for the arguments if we need the type of a standalone operator.
+
+      For now I just put in the more generic version for prims,
+      without worrying about optimizing the constraint solving.  Can
+      worry about that later, if it becomes an issue.  And in any case
+      it probably makes more sense to think about optimizing the
+      constraint-solving process more generally.
+  - [X] idiv (only infer)
+  - [X] mod
+  - [X] divides
+  - [X] choose
+  - [X] rep
+  - [ ] make rep into a lib function (using fromCounts)
+  - [X] cons (need check and infer)
+    - just did infer for now, checking would only be relevant in weird
+      situations, better to just leave it out since it's much simpler!
+  - [X] arithmetic operators (add, mul, div, sub, ssub)
+    - We want to keep the checking case for these... which actually
+      works out quite nicely since we still have TBin around!  Can
+      make special case for checking mode.
+  - [X] neg
+  - [X] exp
+  - [X] set operations --- infer & check
+    - don't care that much about these since we're going to get rid of
+      them
+    - make them into lib functions for now, operators later
+
+- [X] eventually get rid of expandedUOps, expandedBOps & associated
+  check, just expand them all.
+- [ ] put in special cases for ⌊~⌋ and ⌈~⌉ ?
+
+- [X] prefix unary things should just parse as application of prims directly!
+  For example, it's silly to have to say :type not~  instead of
+  just  :type not .
+
+  Would need to change parsing & pretty-printing to match.  We
+  should only need tildes to specify the names of postfix or infix
+  things.  Don't add parsing of prefix applications in the
+  expression parser.  Hmm, except what about prefix negation?
+
+  OK, part of the problem here is that some things are treated as
+  'prefix operators' (e.g. not) and some are treated as 'prims'
+  (e.g. list).  Syntactically there should not be a difference,
+  but they are treated differently right now.  e.g. it is possible
+  to say ':type list' but ':type not' is a parse error (but
+  shouldn't be).  How to unify these?  Maybe I should just do away
+  with 'prefix operators' (except, perhaps, for negation) and turn
+  them all into prims.  not, floor, ceiling, etc.
+
+  - not has two syntaxes: not and ¬  .  Could get rid of ¬ I suppose.
+  - negation is only - .
+  - others are all prefix function names: sqrt, lg, floor, ceiling,
+    abs, size, powerSet.
+
+  Note, making them all prims instead of operators will mean they no
+  longer have have a precedence level --- they will all have the
+  precedence of function application.  But that's probably better
+  anyway.
+- [X] Eventually, should be able to get rid of ATBin, ATUn, DTBin, DTUn.

@@ -1,0 +1,3 @@
+loops:
+  build: cabal -j build -O0
+  test: cabal -j test -O0 --test-show-details=direct

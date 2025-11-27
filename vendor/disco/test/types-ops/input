@@ -1,0 +1,50 @@
+import list
+count Void
+count Unit
+count Bool
+count (Bool + Bool -> Bool)
+count (Bool * Bool)
+count (List(Void))
+count (List (Void * Bool + Void))
+count (List(Unit))
+count (Void * Nat)
+count (Nat * Void)
+count (Void -> Nat)
+count (Nat -> Void)
+count (Void -> Void)
+enumerate Void
+enumerate (Bool -> Bool)
+enumerate (Bool * Bool + Bool)
+enumerate (Unit + Bool)
+enumerate (Void * Unit)
+enumerate (List(Void))
+enumerate (List (Void * Bool + Void))
+enumerate(Bool)
+take(5, enumerate(List(Unit)))
+take(10, enumerate(N))
+take(6, enumerate(N * N))
+enumerate (Void * Nat)
+enumerate (Nat * Void)
+enumerate (Void -> Nat)
+enumerate (Nat -> Void)
+enumerate (Void -> Void)
+-- count Z5
+-- count (Z5 * Z4)
+-- count (Z3 + Z6)
+-- count (Z3 -> Z2)
+-- count (Z3 + Z4 -> Z2)
+-- enumerate Z10
+-- enumerate (Z2 * Z3)
+-- enumerate (Z2 -> Z2)
+-- enumerate (Z3 + Z4)
+count (Bag(Void))
+count (Bag(Unit))
+count (Set(Void))
+count (Set(Unit))
+count (Set(Bool))
+count Char
+count ((N -> Void) -> N)
+count (N -> (N -> Void))
+-- each(\f. f unit, enumerate (Unit -> Unit)) == [unit]
+-- each(\f. f unit, enumerate (Unit -> Bool)) == [false, true]
+-- each(\f. f true, enumerate (Bool -> Bool)) == [false]

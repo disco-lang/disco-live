@@ -1,0 +1,13 @@
+all : List(Prop) -> Prop
+all ps = reduce(~/\~, true, ps)
+
+any : List(Prop) -> Prop
+any ps = reduce(~\/~, false, ps)
+
+||| Assert that a proposition holds on some number in a range.
+
+existsBetween : N * N * (N -> Prop) -> Prop
+existsBetween(a, b, p) = exists n:N. all [n >= a, n < b, p n]
+
+hasFactors : N -> Prop
+hasFactors n = existsBetween(2, n, \r. r divides n)

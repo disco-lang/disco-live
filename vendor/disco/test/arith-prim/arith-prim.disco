@@ -1,0 +1,4 @@
+import num
+
+ps : List(N)
+ps = filter(isPrime, [1 .. 100])

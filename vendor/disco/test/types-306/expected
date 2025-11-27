@@ -1,0 +1,13 @@
+Error: values of type a3 → a4 cannot be compared.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+Error: values of type a8 → a9 cannot be compared.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+Error: values of type Bool → Bool cannot be compared.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+Error: values of type a6 → a7 cannot be compared.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+Error: values of type a3 → a4 cannot be compared.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+Error: values of type a16 → a17 are not boolean.
+https://disco-lang.readthedocs.io/en/latest/reference/not-qual.html
+{}

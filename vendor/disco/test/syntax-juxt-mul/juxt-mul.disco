@@ -1,0 +1,8 @@
+x : Nat
+x = 5
+
+y : Nat
+y = 2
+
+f : Nat -> Nat
+f x = x + 1

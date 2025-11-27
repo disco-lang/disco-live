@@ -1,0 +1,314 @@
+Talked about this with Harley Eades.  Apply for grant to develop this?
+
+* Grant
+  - Opportunities
+
+    NSF HSF Solicitation: http://www.nsf.gov/pubs/2015/nsf15573/nsf15573.htm
+
+    NSF IUSE: EHR  https://www.nsf.gov/pubs/2015/nsf15585/nsf15585.htm
+
+  - What do we need to get done?
+
+    To apply for a grant it will be necessary to have a proof of
+    concept done that exhibts the usefulness of such a language.  I do
+    not think we will need a complete implementation, and we should
+    definately leave some of the more interesting parts to the
+    students who would be funded by the grant.
+
+    The grant language can simply be the language that we have put
+    together in simple.ott.  As a reduction strategy we use the mixed
+    call-by-value/call-by-name strategy; note that this is not
+    call-by-need.  Then we leave adding bounded quantification and
+    adding call-by-need to the grant.  We should implement basic type
+    inference for the simple type system.
+
+  - Notes from Meeting with Dr. August
+
+    - Overall she is excited about the project.
+      - Bridging the gap between math students and CS students is good.
+      - Visualizations as a default is very good! (her words)
+
+    - Need syntax examples that show off examples of programs that are easier
+      to understand/write in our PL as opposed to existing PLs
+
+    - Answer the question: what does our PL have that others do not?
+
+    - 1st paragraph should clearly state exactly what we are going to do,
+      that way the reviewer understands it up front.
+
+    - We must clearly state our education research question, and show that we
+      can answer it.
+
+    - Anwer the question: What will we learn?
+
+    - Examine recent awards to get an idea of what these proposals look like:
+      Go to nsf.gov -> awards -> advanced search
+      Then enter "Element code: 9178" and Keyword "math"
+
+    - Examples throughout the proposal should motivate why our *new*
+      PL is necessary over using or extending an existing PL.  But,
+      these examples should be understandable and impactful to a
+      *non-CS reviewer*.
+
+    - Reviewers may not be from CS, and may be chemist, biologist,
+      etc.
+
+    - Possible venues for publications:
+        - SIGCSE
+        - CCSE
+
+    - Make sure to study in detail the solication, and to make sure that
+      each point is answered.
+
+    - Built in ability to have visualizations is great.
+
+    - Integrated IDE is great.
+
+    - Maybe machine learning examples might appeal to other STEM
+      fields.
+
+    - One thing people do after building something in education is track
+      how the students use it, for example, what functions do they use,
+      how long did they take to solve a problem, etc.  Can we track this
+      in our system?
+
+  - Example abstracts:
+        https://www.nsf.gov/awardsearch/showAward?AWD_ID=1525671&HistoricalAwards=false
+        https://www.nsf.gov/awardsearch/showAward?AWD_ID=1432257&HistoricalAwards=false
+        * https://www.nsf.gov/awardsearch/showAward?AWD_ID=1524739&HistoricalAwards=false
+        https://www.nsf.gov/awardsearch/showAward?AWD_ID=1651280&HistoricalAwards=false
+
+  - Some example research:
+     - On the Implementation of a Discrete Mathematics Course:
+       http://sigcse.org/sigcse/files/documents/pdfs/DiscreteMathReport.pdf
+     - Evaluating discrete mathematics exercises
+       http://dl.acm.org/citation.cfm?id=169352
+     - Report of the SIGCSE Committee on the Implementation of a One-Semester Discrete Mathematics Course
+       http://plone3test.acm.org/sigcse/resources/discrete-mathematics
+     - Discrete math with programming: better together
+       http://dl.acm.org/citation.cfm?id=1227310.1227348
+     - A statistical analysis of the effect of discrete mathematics on the performance of computer science
+       majors in beginning computing classes
+       http://dl.acm.org/citation.cfm?id=5699
+
+** Related work
+
+   + VanDrunen, The Case for Teaching Functional Programming in
+     Discrete Math: http://cs.wheaton.edu/~tvandrun/dmfp/case4dmfp.pdf
+
+     (should follow up more references)
+
+   + LACS consortium, A 2007 model curriculum for a liberal arts degree
+     in computer science. Journal on Educational Resources in
+     Computing, 7(2):2, 2007. ISSN 1531-4278. doi:
+     http://doi.acm.org/10.1145/1240200.1240202.
+
+** Things to mention
+
+   + Talk about how it will help students to think about types.
+   + Design of web-based IDE makes it possible to collect data.
+   + It will help with proofs!  Curry-Howard, Agda, Coq, etc. but not
+     accessible.  We want to explore ways to incorporate it that make
+     it accessible.
+
+** How will it help students?
+
+   + Better at recursion/induction
+   + Proofs
+   + Not making type errors
+   + Be able to relate discrete mathematics to CS more directly
+   + Generate interest (fun, interactive)
+
+* ISETL
+  See ISETL.  BUT: first order; looks like it just has one numeric
+  type (float).  Don't think it really even has much of a type
+  system.  Imperative.  Definitely doesn't have type declarations.
+
+* Syntax
+
+  Use math symbols? Unicode?  Allow both Unicode and ASCII
+  variants of syntax.
+
+  Will probably just end up collapsing types and terms into one
+  syntactic class, if we want to include things like identity
+  (equality) types.
+
+  T ::= ℕ
+      ; ℤ
+      ; ℚ
+      ; Bool
+      ; T → T
+      ; T × T
+      ; T + T         -- use U+ symbol
+      ; List T
+      ; Set T
+
+      ; Perm T        -- include these?  Maybe later...
+
+      ; e = e         -- identity type?
+
+  e ::= x             -- variable
+      ; n             -- natural number literal
+      ; -e            -- unary negation
+      ; O ; S e       -- Peano naturals
+      ; e : T         -- type ascription
+      ; e `binop` e
+      ; e !           -- factorial
+      ; true ; false ; if e then e else e
+      ; x ↦ e         -- can use  |->  notation?   (anonymous function)
+      ; e e           -- application
+      ; (e, e)        -- pairs (+ arbitrary n-tuples)
+      ; left e ; right e
+      ; case e of p1 -> e1; p2 -> e2; ...; pn -> en    -- what to do with case? patterns?
+      ; [e, ..., e]
+      ; {e, ..., e} ; list/set comprehensions
+
+
+      ; <e, ..., e> ; cycles (build permutations out of them)
+
+  z ::= integer
+
+  binop ::= + ; - ; * ; / ; ^ ; mod
+
+* Typing rules/built-in functions
+
+  - Bounded Polymorphism
+
+    To make applying numerical operations +, -, and *, easier bounded
+    polymorphism could be added.
+
+    +, * : ∀ X ⊇ ℕ. X → X → X
+    - : ∀ X ⊇ ℤ. X → X → X
+    / : ℚ → ℚ → ℚ
+
+    Type system extension is straightforward.  I think it would be
+    possible to use the simplier system discussed in TAPL (see Figure
+    26-1 on page 392).
+
+    The hard part of adding bounded quantification is type inference.
+    TAPL does not report on this, but I was able to find a
+    dissertation on the matter:
+
+    http://www.lfcs.inf.ed.ac.uk/reports/98/ECS-LFCS-98-403/ECS-LFCS-98-403.pdf
+
+    Next step is reading this a bit and gauging how hard it would be
+    to implement.
+
+  - Basic type inference
+
+    See TAPL chapter 22.  Things seem to get more interesting in the
+    presence of subtying.  See page 338 of TAPL.
+
+* Reduction Strategy
+
+  We settled on a mixture of CBV and CBN (call-by-need).  Numeric
+  types should reduce to values, but it would be interesting to allow
+  for infinite data types like streams, and hence, we will have a very
+  interesting mixture.  Are there example PLs with a similar mixture?
+
+* Ideas
+
+  Include random generation/checking.
+  Curry-Howard?  Ability to write down theorems etc.?
+
+  No dependency other than equality type.  Ability to *state*
+  equalities and then e.g. have random tests run, or maybe even export
+  to Coq or Agda if you want to do mechanized proofs.
+
+  Subtyping --- matches math practice.
+    - ℕ ⊆ ℤ ⊂ ℚ.
+    - A ⊆ A + B (and vice versa)?  Maybe not.
+
+  Function application is juxtaposition.  Works out nicely with
+  syntax for pairs, triples, etc.
+
+  Allow any number to be treated as a function of type ∀ X ⊇ ℕ. X
+  → X, which multiplies by that number.  This applies not just to
+  numeric literals but to *any* numeric expression.  So for
+  example one could write  (5x + 3y)(4z + 3)  instead of
+  (5*x + 3*y)*(4*z + 3).
+
+  Need to come up with a very stripped-down version of this to
+  implement first!  What are the MOST INTERESTING parts so far?
+  Then add features incrementally.
+
+  Most interesting part is numeric types, bounded quantification
+  for arithmetic operators, treating numbers as functions for
+  multiplication.
+
+  Case analysis/pattern matching: maybe a construct something like
+  this?
+
+    { exp1  when  guard
+      exp2  when  exp = pattern
+    }
+
+  Bake in special syntax for lists, sets.  Have to bake in a bunch of
+  operations.
+
+  Mixfix operators?  User-defined infix operators?
+
+  Error messages are going to be really important and really hard!
+
+  Use trifecta for parsing?
+
+  + Features for developers/teachers?
+    + Include algebraic data types for use in developing libraries?
+    + Ability to extend the syntax in a library?
+
+* Next steps
+
+  + Message logging framework
+  + Start writing documentation
+  + Function properties/annotations
+    + Idempotent, etc.
+    + Memoization
+    + Inverse
+  + Collect multiple warnings & errors (parsing, type checking)
+  + LaTeX output mode for pretty-printer
+  + Markdown for documentation? See cheapskate library --- what Idris uses.
+  + mechanism for language extensions (like GHC has)
+  + Dynamic explorable error messages:
+    - Dynamic witnesses for type errors (see ICFP 2016 paper,
+      https://goo.gl/NCKXFi)
+
+* Crazy/cool ideas
+
+  + Type qualifiers like "nonzero", "nonnegative", "non-empty", etc.?
+  + Type qualifiers for combinatorics (i.e. "reusable", "nonreusable", etc.?)
+  + Built-in counters, e.g. for collecting data re: big-O analysis
+  + Built-in visualizations (using Diagrams), e.g.
+    - call graph
+    - discrete structures
+  + playgrounds:
+    - Can we do something like -fdefer-type-errors so that
+      students files load despite errors.
+  + More sophisticated checking of subtraction for N in a case
+  + Termination analysis
+
+** Github issues
+
+  Next steps that have been turned into Github issues:
+
+  + (#8)  Chained comparisons   (2 < x <= 5)
+  + (#11) Z/Q patterns (general arithmetic patterns?)
+  + (#6)  polymorphism
+  + (#12) Multi-clause definitions
+  + (#13) QuickCheck properties in test suite
+  + (#14) Finite types (like Fin n)
+  + (#15) Stepwise execution (small step evaluation)
+  + (#16) Graph reduction?  Don't re-evaluate...
+
+* Links
+
+  Here's how Idris represents terms: https://github.com/idris-lang/Idris-dev/blob/8ea27ae997ea1e4214ce47ad228bd7c35a891459/src/Idris/Core/TT.hs
+  Idris parsing:
+    https://github.com/idris-lang/Idris-dev/blob/master/src/Idris/Parser/Helpers.hs
+    https://github.com/idris-lang/Idris-dev/blob/master/src/Idris/Parser/Expr.hs
+
+  Trifecta:
+    http://hackage.haskell.org/package/trifecta
+    Use in conjunction with http://hackage.haskell.org/package/parsers
+
+  Layout parsing:
+    http://hackage.haskell.org/package/located

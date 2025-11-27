@@ -1,0 +1,18 @@
+type S = List(Char)
+
+!!! x == "hi"
+x : S
+x = "hi"
+
+type Tree(a) = Unit + a * Tree(a) * Tree(a)
+
+leaf : Tree(a)
+leaf = left(unit)
+
+testT : Tree(N)
+testT = right(3, right(4, right(1, leaf, leaf), right(6, leaf, leaf)), right(9, leaf, leaf))
+
+!!!  mirror(mirror(testT)) == testT
+mirror : Tree(a) -> Tree(a)
+mirror(left(unit)) = left(unit)
+mirror(right(a,l,r)) = right(a, mirror(r), mirror(l))

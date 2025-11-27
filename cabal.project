@@ -1,4 +1,7 @@
-packages: .
+packages:
+  .
+  vendor/disco
+  vendor/polysemy
 
 allow-newer:
   disco:base

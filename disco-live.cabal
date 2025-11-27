@@ -16,12 +16,11 @@ maintainer:      byorgey@gmail.com
 copyright:       Disco team 2025-2026 (see LICENSE)
 extra-doc-files:
   README.md
+tested-with:         GHC ==9.12.2
 
 source-repository head
   type:     git
   location: https://github.com/disco-lang/disco.git
-
-tested-with:         GHC ==9.12.2
 
 executable disco-live
   -- Compiler options that are necessary for the WASM backend.
@@ -37,7 +36,8 @@ executable disco-live
   build-depends:
     , ghc-experimental ^>=0.1 || (>=9.1000 && <9.1300)
     , base         >=4.8     && <4.22
---    , disco        >=0.2     && <0.3
+    , disco        == 0.2.1
+    , polysemy     == 1.9.2.1
     , text         >=2.0.2   && <2.2
 
   other-modules:

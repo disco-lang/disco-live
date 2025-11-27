@@ -1,0 +1,14 @@
+import num
+
+!!! ∀ x : ℕ. reduce(~*~, 1, factor (x+1)) == (x+1)
+dummy : Unit
+dummy = unit
+
+||| The size (cardinality) of a set.
+!!! setSize2 {} == 0
+!!! setSize2 {1} == 1
+!!! setSize2 {1..10} == 10
+!!! setSize2 {1,1,1,2,3} == 3
+!!! ∀ s : Set(N). setSize2 s == setSize2 (s ∪ s)
+setSize2 : Set(N) -> N
+setSize2 s = reduce(~+~, 0, each (\x.1, bag s))

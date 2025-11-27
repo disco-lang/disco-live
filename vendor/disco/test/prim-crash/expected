@@ -1,0 +1,11 @@
+Loading prim.disco...
+User crash: nope
+User crash: nope
+User crash: nope
+let x : ℕ = crash("nope") in 3 + x : ℕ
+User crash: nope
+crash : List(Char) → a
+User crash: nope
+User crash: nope
+(λx : ℕ. 1)(crash("nope")) : ℕ
+User crash: nope

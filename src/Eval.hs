@@ -2,8 +2,13 @@ module Eval
     ( eval
     ) where
 
+import Disco.Parser
+    ( term
+    , runParser
+    )
+
 {-----------------------------------------------------------------------------
     Rendering Logic
 ------------------------------------------------------------------------------}
 eval :: String -> String
-eval name = reverse name
+eval = show . runParser term "<interactive>"

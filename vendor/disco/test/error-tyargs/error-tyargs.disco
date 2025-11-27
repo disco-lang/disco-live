@@ -1,0 +1,1 @@
+type X(a,b) = Unit + a*b
