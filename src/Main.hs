@@ -3,7 +3,7 @@ module Main where
 import Control.Concurrent
 import GHC.Wasm.Prim
 
-import Eval (eval)
+import Eval (eval, initDisco)
 
 {-----------------------------------------------------------------------------
     JavaScript Imports
@@ -44,6 +44,8 @@ setup = do
     evalButton <- js_document_getElementById (toJSString "eval")
     onEvalButtonCallback <- asEventListener onEvalButtonClick
     js_addEventListener evalButton (toJSString "click") onEvalButtonCallback
+    
+    initDisco
 
 -- | Handle button clicks.
 onEvalButtonClick :: JSVal -> IO ()

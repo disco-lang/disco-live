@@ -15,6 +15,9 @@
     <div id="out">
     </div>
   </div>
-  <script type="module" src="runtime.js"></script>
+  <script type="module">
+    import { runWASM } from "./runtime.js";
+    runWASM();
+  </script>
 </body>
 </html>
