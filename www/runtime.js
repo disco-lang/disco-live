@@ -2,27 +2,36 @@ import { WASI } from "https://cdn.jsdelivr.net/npm/@runno/wasi@0.7.0/dist/wasi.j
 import ghc_wasm_jsffi from "./ghc_wasm_jsffi.js";
 
 export async function runWASM() {
+  const addLibFile = async (name, result) => {
   // 1. Fetch some file (or files) from your server or CDN
-  const resp = await fetch("/lib/num.disco");
-  const buf = await resp.arrayBuffer();
-  
-  const fs = {
-    "/lib/num.disco": {
-      path: "/lib/num.disco",
+    const filename = "/stdlib/" + name + ".disco";
+    const resp = await fetch(filename);
+    const buf = await resp.arrayBuffer();
+
+    result[filename] = {
+      path: filename,
       timestamps: {
         access: new Date(),
         change: new Date(),
         modification: new Date(),
       },
-      mode: "string",               // or "string" if text
+      mode: "bytes",               // or "string" if text
       content: new Uint8Array(buf), // bytes of the file
-    },
-    // ... you can add more files / nested directories similarly
+    };
   };
+  const fs = {};
+  await addLibFile("container", fs);
+  await addLibFile("graph", fs);
+  await addLibFile("list", fs);
+  await addLibFile("num", fs);
+  await addLibFile("prim", fs);
+  await addLibFile("product", fs);
+  await addLibFile("prop", fs);
+  await addLibFile("string", fs);
 
   const wasi = new WASI({
       env: {
-        disco_datadir: "lib"
+        disco_datadir: "stdlib"
       },
       fs: fs,
       stdout: (out) => console.log("[wasm stdout]", out),

@@ -50,8 +50,13 @@ setup = do
 -- | Handle button clicks.
 onEvalButtonClick :: JSVal -> IO ()
 onEvalButtonClick event = do
-    expr       <- fromJSString <$> js_view_state_doc_toString
-    
+    module_ <- fromJSString <$> js_view_state_doc_toString
+    exprIn  <- js_document_getElementById (toJSString "expr")
+    expr    <- fromJSString <$> js_input_value exprIn
+
+    eval expr
+    {-
     let svg = eval expr
     outDiv     <- js_document_getElementById (toJSString "out")
     js_element_setInnerHtml outDiv (toJSString svg)
+    -}
