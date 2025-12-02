@@ -4,8 +4,9 @@ import ghc_wasm_jsffi from "./ghc_wasm_jsffi.js";
 export async function runWASM() {
   const addLibFile = async (name, result) => {
   // 1. Fetch some file (or files) from your server or CDN
-    const filename = "/stdlib/" + name + ".disco";
-    const resp = await fetch(filename);
+    const urlpath = "stdlib/" + name + ".disco";
+    const filename = "/" + urlpath;
+    const resp = await fetch(urlpath);
     const buf = await resp.arrayBuffer();
 
     result[filename] = {
