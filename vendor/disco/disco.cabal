@@ -465,11 +465,11 @@ library
                        Disco.Interactive.CmdLine
                        Disco.Interactive.Commands
                        Disco.Doc
+                       Polysemy.Random
 
   other-modules:       Paths_disco
                        Polysemy.ConstraintAbsorber
                        Polysemy.ConstraintAbsorber.MonadCatch
-                       Polysemy.Random
 
   autogen-modules:     Paths_disco
 

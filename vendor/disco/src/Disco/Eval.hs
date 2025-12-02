@@ -19,7 +19,7 @@ module Disco.Eval (
   DiscoConfig,
   initDiscoConfig,
   debugMode,
-  TopInfo,
+  TopInfo (..),
   replModInfo,
   topEnv,
   topModMap,

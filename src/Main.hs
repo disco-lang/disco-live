@@ -54,9 +54,6 @@ onEvalButtonClick event = do
     exprIn  <- js_document_getElementById (toJSString "expr")
     expr    <- fromJSString <$> js_input_value exprIn
 
-    eval expr
-    {-
-    let svg = eval expr
-    outDiv     <- js_document_getElementById (toJSString "out")
-    js_element_setInnerHtml outDiv (toJSString svg)
-    -}
+    result <- eval expr
+    outDiv <- js_document_getElementById (toJSString "out")
+    js_element_setInnerHtml outDiv (toJSString result)

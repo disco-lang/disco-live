@@ -15,9 +15,8 @@
     <label for="expr">REPL command to execute</label>
     <input type="text" id="expr" value="1 + 2"/>
     <input type="button" id="eval" value="Evaluate"/>
-    <div id="out">
-      (Result in browser console)
-    </div>
+    <pre id="out">(Result here)
+    </pre>
   </div>
   <script type="module">
     import { runWASM } from "./runtime.js";

@@ -5,19 +5,6 @@ module Eval
     , eval
     ) where
 
-import Disco.Error
-import Disco.Eval
-    ( initDiscoConfig
-    , runDisco
-    )
-import Disco.Interactive.Commands 
-    ( dispatch
-    , discoCommands
-    , parseLine
-    )
-import Disco.Messages
-    ( info
-    )
 import Disco.Module
     ( Resolver (..)
     , resolveModule
@@ -29,29 +16,23 @@ import Disco.Parser
     ( term
     , runParser
     )
-import Disco.Pretty
-    ( pretty'
-    , text
-    )
 import Polysemy
     ( Embed
     , Sem
     , runM
     )
-import Polysemy.Error
-    ( catch
+
+import Interpreter
+    ( Repl
+    , initial
+    , execute
     )
-import qualified Data.Set as Set
 
 {-----------------------------------------------------------------------------
     Rendering Logic
 ------------------------------------------------------------------------------}
-eval :: String -> IO ()
-eval expr = runDisco initDiscoConfig $ do
-    case parseLine discoCommands Set.empty expr of
-        Left e -> info (text e)
-        Right l ->
-            catch @DiscoError (dispatch discoCommands l) (info . pretty')
+eval :: String -> IO String
+eval command = fst <$> execute command initial
 
 parseTest :: String -> String
 parseTest = show . runParser term "<interactive>"

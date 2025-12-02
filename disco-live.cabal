@@ -35,11 +35,15 @@ executable disco-live
 
   build-depends:
     , ghc-experimental ^>=0.1 || (>=9.1000 && <9.1300)
-    , base         >=4.8     && <4.22
-    , containers   >=0.5     && <0.8
-    , disco        == 0.2.1
-    , polysemy     == 1.9.2.1
-    , text         >=2.0.2   && <2.2
+    , base         >=4.8      && <4.22
+    , containers   >=0.5      && <0.8
+    , disco        ==0.2.1
+    , haskeline    >=0.8      && <0.9
+    , lens         >=4.14     && <5.4
+    , polysemy     ==1.9.2.1
+    , random       >=1.2.1.1  && <1.4
+    , text         >=2.0.2    && <2.2
 
   other-modules:
     Eval
+    Interpreter
