@@ -5,6 +5,7 @@ module Eval
     , eval
     ) where
 
+import Control.Monad (forM_)
 import Disco.Module
     ( Resolver (..)
     , resolveModule
@@ -21,6 +22,7 @@ import Polysemy
     , Sem
     , runM
     )
+import System.Environment
 
 import Interpreter
     ( Repl
@@ -44,5 +46,13 @@ resolveModule' = resolveModule
 
 initDisco :: IO ()
 initDisco = do
+    putStrLn $ "Printing Environment"
+    xs <- getEnvironment
+    forM_ xs $ \(a,b) -> putStrLn $ a <> " = " <> b
+
+    let filename = "/stdlib/num.disco"
+    putStrLn $ "Printing " <> filename
+    putStrLn =<< readFile filename
+
     s <- runM $ resolveModule' FromStdlib "num"
     print s
