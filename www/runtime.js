@@ -30,10 +30,11 @@ export async function runWASM() {
   await addLibFile("prop", fs);
   await addLibFile("string", fs);
 
+  // NOTE: env: may not work on a .wasm module that was
+  // processed with the `wizer` tool.
+  // For this reason,
+  // we set some environment variables inside the .wasm module.
   const wasi = new WASI({
-      env: {
-        disco_datadir: "stdlib"
-      },
       fs: fs,
       stdout: (out) => console.log("[wasm stdout]", out),
   });

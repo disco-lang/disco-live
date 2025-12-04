@@ -46,13 +46,10 @@ resolveModule' = resolveModule
 
 initDisco :: IO ()
 initDisco = do
-    putStrLn $ "Printing Environment"
-    xs <- getEnvironment
-    forM_ xs $ \(a,b) -> putStrLn $ a <> " = " <> b
-
-    let filename = "/stdlib/num.disco"
-    putStrLn $ "Printing " <> filename
-    putStrLn =<< readFile filename
+    -- NOTE: We set path environment variables here,
+    -- because processing the .wasm module with `wizer` may bake
+    -- them into the code.
+    setEnv "disco_datadir" "stdlib"
 
     s <- runM $ resolveModule' FromStdlib "num"
     print s
