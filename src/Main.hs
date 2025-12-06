@@ -3,7 +3,7 @@ module Main where
 import Control.Concurrent
 import GHC.Wasm.Prim
 
-import Eval (eval, initDisco)
+import Eval (RefRepl, eval, initDisco)
 
 {-----------------------------------------------------------------------------
     JavaScript Imports
@@ -40,20 +40,20 @@ foreign export javascript "setup" setup :: IO ()
 -- | Main entrypoint.
 setup :: IO ()
 setup = do
+    ref <- initDisco
+    
     -- Register callback for button click.
     evalButton <- js_document_getElementById (toJSString "eval")
-    onEvalButtonCallback <- asEventListener onEvalButtonClick
+    onEvalButtonCallback <- asEventListener (onEvalButtonClick ref)
     js_addEventListener evalButton (toJSString "click") onEvalButtonCallback
     
-    initDisco
-
 -- | Handle button clicks.
-onEvalButtonClick :: JSVal -> IO ()
-onEvalButtonClick event = do
+onEvalButtonClick :: RefRepl -> JSVal -> IO ()
+onEvalButtonClick ref event = do
     module_ <- fromJSString <$> js_view_state_doc_toString
     exprIn  <- js_document_getElementById (toJSString "expr")
     expr    <- fromJSString <$> js_input_value exprIn
 
-    result <- eval expr
+    result <- eval ref expr
     outDiv <- js_document_getElementById (toJSString "out")
     js_element_setInnerHtml outDiv (toJSString result)

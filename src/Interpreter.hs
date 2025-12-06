@@ -11,6 +11,7 @@ module Interpreter
     , execute
     ) where
 
+import Disco.AST.Surface (emptyModule)
 import Disco.Context hiding (filter)
 import Disco.Error
 import Disco.Eval
@@ -21,9 +22,11 @@ import Disco.Interactive.Commands
     )
 import Disco.Messages
 import Disco.Module
+import Disco.Names (ModuleName (REPLModule))
 import Disco.Pretty
 import Disco.Value
 
+import Control.Monad (void)
 import Control.Lens
     ( makeLenses
     , toListOf
@@ -79,6 +82,14 @@ initTopInfo = TopInfo
     , _discoConfig = initDiscoConfig
     }
 
+-- | Load the standard library.
+-- TODO: Doesn't work yet.
+loadStdlib :: Repl -> IO Repl
+loadStdlib =
+    fmap snd
+    . runDiscoEffects
+        (loadParsedDiscoModule True FromStdlib REPLModule emptyModule)
+
 -- | Interpreter command
 type Command = String
 
@@ -91,7 +102,7 @@ execute command = runDiscoEffects (runCommand command)
 
 -- | Run a top-level computation.
 runDiscoEffects
-    :: (forall r. Members DiscoEffects r => Sem r ())
+    :: (forall r. Members DiscoEffects r => Sem r a)
     -> Repl
     -> IO (Result, Repl)
 runDiscoEffects action Repl{topInfo,mem} = do
@@ -110,7 +121,7 @@ runDiscoEffects action Repl{topInfo,mem} = do
         . mapError EvalErr -- Embed runtime errors into top-level error type
         . failToError Panic -- Turn pattern-match failures into a Panic error
         . runReader (view topEnv topInfo) -- Keep track of current Env
-        $ action
+        . void $ action
     let repl' = Repl topInfo' mem'
     pure (showOutputs outputs, repl')
   where

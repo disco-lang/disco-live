@@ -1,7 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 module Eval
-    ( initDisco
+    ( RefRepl
+    , initDisco
     , eval
     ) where
 
@@ -13,10 +14,6 @@ import Disco.Module
 import Disco.Names
     ( ModuleProvenance
     )
-import Disco.Parser
-    ( term
-    , runParser
-    )
 import Polysemy
     ( Embed
     , Sem
@@ -26,30 +23,37 @@ import System.Environment
 
 import Interpreter
     ( Repl
-    , initial
     , execute
+    , initial
     )
+import Data.IORef
 
 {-----------------------------------------------------------------------------
     Rendering Logic
 ------------------------------------------------------------------------------}
-eval :: String -> IO String
-eval command = fst <$> execute command initial
+type RefRepl = IORef Repl
 
-parseTest :: String -> String
-parseTest = show . runParser term "<interactive>"
+eval :: RefRepl -> String -> IO String
+eval ref command = do
+    repl0 <- readIORef ref
+    (result, repl1) <- execute command repl0
+    writeIORef ref repl1
+    pure result
 
 resolveModule'
     :: Resolver -> String
     -> Sem '[Embed IO] (Maybe (FilePath, ModuleProvenance))
 resolveModule' = resolveModule
 
-initDisco :: IO ()
+initDisco :: IO RefRepl
 initDisco = do
     -- NOTE: We set path environment variables here,
     -- because processing the .wasm module with `wizer` may bake
     -- them into the code.
     setEnv "disco_datadir" "stdlib"
 
+    -- Debug output
     s <- runM $ resolveModule' FromStdlib "num"
     print s
+
+    newIORef initial
