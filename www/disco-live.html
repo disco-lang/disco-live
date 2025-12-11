@@ -3,20 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+      }
+      #left {
+        flex: 1;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+      }
+      #right {
+        flex: 1;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      #editor {
+        flex: 1;
+        width: 100%;
+        resize: none;
+      }
+      #out {
+        flex: 1;
+        border: 1px solid #ccc;
+        padding: 6px;
+        overflow: scroll;
+      }
+      #out pre {
+        margin: 1px;
+      }
+      #expr {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px;
+      }
+      .cm-editor {
+        height: auto;
+      }
+    </style>
 </head>
 
 <body>
   <script defer src="vendor/codemirror-6.js"></script>
   <script defer src="js/editor.js"></script>
-  <div>
-    <div id="editor">
-    </div>
-
-    <label for="expr">REPL command to execute</label>
+  <div id="left">
+    <label for="editor">File <code>disco-live.disco</code>:</label>
+    <div id="editor"></div>
+  </div>
+  <div id="right">
+    <label for="out">Interpreter history:</label>
+    <div id="out"></div>
+    <label for="expr">Command:</label>
     <input type="text" id="expr" value="1 + 2"/>
     <input type="button" id="eval" value="Evaluate"/>
-    <pre id="out">(Result here)
-    </pre>
+  </div>
   </div>
   <script type="module">
     import { runWASM } from "./runtime.js";
