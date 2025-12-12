@@ -38,6 +38,9 @@ foreign import javascript unsafe "view.state.doc.toString()"
 foreign import javascript "$1.innerHTML = $2"
   js_element_setInnerHtml :: JSVal -> JSString -> IO ()
 
+foreign import javascript unsafe "$1.scrollTop = $1.scrollHeight"
+  js_element_scrollToBottom :: JSVal -> IO ()
+
 main :: IO ()
 main = error "main is unused"
 
@@ -88,3 +91,4 @@ logHistory s = do
     pre <- js_document_createElement (toJSString "pre")
     js_element_appendChild div pre
     js_element_setInnerHtml pre (toJSString s)
+    js_element_scrollToBottom div
