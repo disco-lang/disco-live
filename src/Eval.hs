@@ -4,46 +4,34 @@ module Eval
     ( RefRepl
     , initDisco
     , eval
+    , loadFile
     ) where
 
-import Control.Monad (forM_)
-import Disco.Module
-    ( Resolver (..)
-    , resolveModule
-    )
-import Disco.Names
-    ( ModuleProvenance
-    )
-import Polysemy
-    ( Embed
-    , Sem
-    , runM
-    )
 import System.Environment
 
-import Interpreter
-    ( Repl
-    , execute
-    , initial
-    )
+import qualified Interpreter
 import Data.IORef
 
 {-----------------------------------------------------------------------------
     Rendering Logic
 ------------------------------------------------------------------------------}
-type RefRepl = IORef Repl
+type RefRepl = IORef Interpreter.Repl
 
 eval :: RefRepl -> String -> IO String
 eval ref command = do
     repl0 <- readIORef ref
-    (result, repl1) <- execute command repl0
+    (result, repl1) <- Interpreter.execute command repl0
     writeIORef ref repl1
     pure result
 
-resolveModule'
-    :: Resolver -> String
-    -> Sem '[Embed IO] (Maybe (FilePath, ModuleProvenance))
-resolveModule' = resolveModule
+loadFile :: RefRepl -> String -> IO String
+loadFile ref s = do
+    writeFile "disco-live.disco" s
+    repl0 <- readIORef ref
+    (result, repl1) <-
+        Interpreter.execute (":load disco-live.disco") repl0
+    writeIORef ref repl1
+    pure result
 
 initDisco :: IO RefRepl
 initDisco = do
@@ -51,9 +39,4 @@ initDisco = do
     -- because processing the .wasm module with `wizer` may bake
     -- them into the code.
     setEnv "disco_datadir" "stdlib"
-
-    -- Debug output
-    s <- runM $ resolveModule' FromStdlib "num"
-    print s
-
-    newIORef initial
+    newIORef Interpreter.initial

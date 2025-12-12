@@ -3,7 +3,7 @@ module Main where
 import Control.Monad (when)
 import GHC.Wasm.Prim
 
-import Eval (RefRepl, eval, initDisco)
+import Eval (RefRepl, eval, initDisco, loadFile)
 
 {-----------------------------------------------------------------------------
     JavaScript Imports
@@ -81,6 +81,8 @@ handleEval ref = do
     expr    <- fromJSString <$> js_input_value exprIn
 
     logHistory $ "disco> " <> expr
+    result <- loadFile ref module_
+    logHistory result
     result <- eval ref expr
     logHistory result
 
