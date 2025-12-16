@@ -12,7 +12,6 @@
       #left {
         flex: 1;
         padding: 8px;
-        display: flex;
         flex-direction: column;
       }
       #right {
@@ -23,9 +22,8 @@
         gap: 8px;
       }
       #editor {
-        flex: 1;
         width: 100%;
-        resize: none;
+        resize: scroll;
       }
       #out {
         flex: 1;
@@ -45,6 +43,7 @@
       .cm-editor {
         height: auto;
       }
+      #editor-actions {float:right;}
     </style>
 </head>
 
@@ -54,6 +53,17 @@
   <div id="left">
     <label for="editor">File <code>disco-live.disco</code>:</label>
     <div id="editor"></div>
+    <div id="editor-actions">
+      <input type="button" id="save" value="Save to file"
+        onclick="saveFile()"/>
+      <a style="display:none" id="save-file" download='deltaq-live.json'></a>
+      <input type="button" id="open" value="Load from file"
+        onclick="document.getElementById('open-file').click()"/>
+      <input type="file" id="open-file" accept=".disco" style="display:none;">
+      &nbsp;
+      <input type="button" id="link" value="Copy link"
+        onclick="copyLink()"/>
+    </div>
   </div>
   <div id="right">
     <label for="out">Interpreter history:</label>
@@ -66,6 +76,49 @@
   <script type="module">
     import { runWASM } from "./runtime.js";
     runWASM();
+  </script>
+  <script>
+    const getEditorContents = () => {
+      return view.state.doc.toString()
+    }
+    const setEditorContents = (s) => {
+      view.dispatch({
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: s
+        }
+      })
+    }
+
+    const saveFile = () => {
+      const content = getEditorContents()
+      const blob = new Blob([content], { type: "text/plain" })
+      const a = document.getElementById('save-file')
+      a.href = URL.createObjectURL(blob)
+      a.download = "disco-live.disco"
+      a.click()
+    }
+    document.getElementById("open-file").addEventListener("change", function (event) {
+      const file = event.target.files[0]
+      const reader = new FileReader()
+
+      reader.onload = (e) => {
+        setEditorContents(e.target.result)
+      }
+      reader.readAsText(file)
+    })
+  </script>
+  <script>
+    const uriParamFromEditor = () => {
+      return 'module=' + encodeURIComponent(getEditorContents());
+    }
+    const copyLink = () => {
+      const base = window.location.origin + window.location.pathname;
+      let query = ""
+      query = query + '?' + uriParamFromEditor('module');
+      navigator.clipboard.writeText(base + encodeURI(query));
+    };
   </script>
 </body>
 </html>
