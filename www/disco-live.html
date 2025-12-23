@@ -7,29 +7,36 @@
       body {
         margin: 0;
         height: 100vh;
-        display: flex;
       }
-      #left {
-        flex: 1;
-        padding: 8px;
-        flex-direction: column;
+      #wrap > * {
+        padding:1rem;
       }
-      #right {
-        flex: 1;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+      @media (min-width:768px) {
+        #wrap {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
       }
+
+      #title { padding: 6px; }
+      #name { font-size: 200%;}
+      #title img { width: 30px; margin-bottom:-5px;}
+
       #editor {
         width: 100%;
         resize: scroll;
       }
+      .cm-editor {
+        height: auto;
+      }
+      #editor-actions { float:right; }
+
       #out {
-        flex: 1;
         border: 1px solid #ccc;
         padding: 6px;
         overflow: scroll;
+        max-width: 30em;
+        margin-bottom:6px;
       }
       #out pre {
         margin: 1px;
@@ -39,39 +46,44 @@
         box-sizing: border-box;
         padding: 6px;
         font-family: monospace;
+        margin-bottom:6px;
       }
-      .cm-editor {
-        height: auto;
-      }
-      #editor-actions {float:right;}
+      #eval { width: 100%; }
     </style>
 </head>
 
 <body>
   <script defer src="vendor/codemirror-6.js"></script>
   <script defer src="js/editor.js"></script>
-  <div id="left">
-    <label for="editor">File <code>disco-live.disco</code>:</label>
-    <div id="editor"></div>
-    <div id="editor-actions">
-      <input type="button" id="save" value="Save to file"
-        onclick="saveFile()"/>
-      <a style="display:none" id="save-file" download='deltaq-live.json'></a>
-      <input type="button" id="open" value="Load from file"
-        onclick="document.getElementById('open-file').click()"/>
-      <input type="file" id="open-file" accept=".disco" style="display:none;">
-      &nbsp;
-      <input type="button" id="link" value="Copy link"
-        onclick="copyLink()"/>
+  <div id="title">
+    <img src="logo.png"/>
+    <span id="name">Disco</span>
+    <span>&nbsp; Functional programming for discrete math.</span>
+  </div>
+  <div id="wrap">
+    <div id="left">
+      <label for="editor">File <code>disco-live.disco</code>:</label>
+      <div id="editor"></div>
+      <div id="editor-actions">
+        <input type="button" id="save" value="Save to file"
+          onclick="saveFile()"/>
+        <a style="display:none" id="save-file" download='deltaq-live.json'></a>
+        <input type="button" id="open" value="Load from file"
+          onclick="document.getElementById('open-file').click()"/>
+        <input type="file" id="open-file" accept=".disco" style="display:none;">
+        &nbsp;
+        <input type="button" id="link" value="Copy link"
+          onclick="copyLink()"/>
+      </div>
     </div>
-  </div>
-  <div id="right">
-    <label for="out">Interpreter history:</label>
-    <div id="out"></div>
-    <label for="expr">Command:</label>
-    <input type="text" id="expr" value="1 + 2"/>
-    <input type="button" id="eval" value="Evaluate (↩︎)"/>
-  </div>
+    <div id="right">
+      <label for="out">Interpreter history:</label>
+      <div id="out"></div>
+        <label for="expr">Command:</label>
+        <input type="text" id="expr" value="1 + 2"/>
+        <input type="button" id="eval" value="Evaluate (↩︎)"/>
+      </div>
+    </div>
   </div>
   <script type="module">
     import { runWASM } from "./runtime.js";
