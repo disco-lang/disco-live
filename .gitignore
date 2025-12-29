@@ -21,3 +21,6 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+www/*.wasm
+www/ghc_wasm_jsffi.js
