@@ -3,7 +3,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeApplications #-}
-module Interpreter 
+module Interpreter
     ( Repl
     , Command
     , Result
@@ -15,7 +15,7 @@ import Disco.AST.Surface (emptyModule)
 import Disco.Context hiding (filter)
 import Disco.Error
 import Disco.Eval
-import Disco.Interactive.Commands 
+import Disco.Interactive.Commands
     ( dispatch
     , discoCommands
     , parseLine

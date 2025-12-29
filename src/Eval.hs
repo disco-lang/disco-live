@@ -1,42 +1,37 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 module Eval
-    ( RefRepl
-    , initDisco
-    , eval
+    ( eval
     , loadFile
     ) where
 
-import System.Environment
+import Data.Char (isSpace)
+import Data.Hashable (hash)
+import Data.IORef
 
 import qualified Interpreter
-import Data.IORef
+import State
 
 {-----------------------------------------------------------------------------
     Rendering Logic
 ------------------------------------------------------------------------------}
-type RefRepl = IORef Interpreter.Repl
 
-eval :: RefRepl -> String -> IO String
+eval :: RefState -> String -> IO String
 eval ref command = do
-    repl0 <- readIORef ref
-    (result, repl1) <- Interpreter.execute command repl0
-    writeIORef ref repl1
-    pure result
+  AppState repl0 h <- readIORef ref
+  (result, repl1) <- Interpreter.execute command repl0
+  writeIORef ref (AppState repl1 h)
+  pure result
 
-loadFile :: RefRepl -> String -> IO String
+loadFile :: RefState -> String -> IO (Maybe String)
 loadFile ref s = do
-    writeFile "disco-live.disco" s
-    repl0 <- readIORef ref
-    (result, repl1) <-
-        Interpreter.execute (":load disco-live.disco") repl0
-    writeIORef ref repl1
-    pure result
-
-initDisco :: IO RefRepl
-initDisco = do
-    -- NOTE: We set path environment variables here,
-    -- because processing the .wasm module with `wizer` may bake
-    -- them into the code.
-    setEnv "disco_datadir" "stdlib"
-    newIORef Interpreter.initial
+  AppState repl0 h <- readIORef ref
+  let h' = hash s
+  if h' /= h && not (all isSpace s)
+    then do
+      writeFile "disco-live.disco" s
+      (result, repl1) <- Interpreter.execute (":load disco-live.disco") repl0
+      writeIORef ref (AppState repl1 h')
+      pure (Just result)
+    else
+      pure Nothing

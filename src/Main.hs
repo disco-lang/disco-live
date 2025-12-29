@@ -3,7 +3,8 @@ module Main where
 import Control.Monad (when)
 import GHC.Wasm.Prim
 
-import Eval (RefRepl, eval, initDisco, loadFile)
+import Eval (eval, loadFile)
+import State
 
 {-----------------------------------------------------------------------------
     JavaScript Imports
@@ -52,7 +53,7 @@ foreign export javascript "setup" setup :: IO ()
 -- | Main entrypoint.
 setup :: IO ()
 setup = do
-    ref <- initDisco
+    ref <- initState
 
     -- Register callback for button click.
     evalButton <- js_document_getElementById (toJSString "eval")
@@ -64,25 +65,27 @@ setup = do
     js_addEventListener exprIn (toJSString "keyup") callback
 
 -- | Handle 'keyup'.
-onExprKeyUp :: RefRepl -> JSVal -> IO ()
+onExprKeyUp :: RefState -> JSVal -> IO ()
 onExprKeyUp ref event = do
     key <- js_event_key event
     when (fromJSString key == "Enter") $ handleEval ref
 
 -- | Handle button clicks.
-onEvalButtonClick :: RefRepl -> JSVal -> IO ()
+onEvalButtonClick :: RefState -> JSVal -> IO ()
 onEvalButtonClick ref _ = handleEval ref
 
 -- | Handle evaluation request.
-handleEval :: RefRepl -> IO ()
+handleEval :: RefState -> IO ()
 handleEval ref = do
     module_ <- fromJSString <$> js_view_state_doc_toString
     exprIn  <- js_document_getElementById (toJSString "expr")
     expr    <- fromJSString <$> js_input_value exprIn
 
     logHistory $ "disco> " <> expr
-    result <- loadFile ref module_
-    logHistory result
+    mresult <- loadFile ref module_
+    case mresult of
+      Nothing -> pure ()
+      Just result -> logHistory result
     result <- eval ref expr
     logHistory result
 

@@ -38,6 +38,7 @@ executable disco-live
     , base         >=4.8      && <4.22
     , containers   >=0.5      && <0.8
     , disco        ==0.2.1
+    , hashable     >=1.4      && <1.6
     , haskeline    >=0.8      && <0.9
     , lens         >=4.14     && <5.4
     , polysemy     ==1.9.2.1
@@ -47,3 +48,4 @@ executable disco-live
   other-modules:
     Eval
     Interpreter
+    State
