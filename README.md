@@ -13,6 +13,15 @@ nix develop
 ./build.sh
 ```
 
+If you get an error about experimental features being disabled, then instead
+of `nix develop` you may need to use a command like
+
+```
+nix --extra-experimental-features "nix-command flakes" develop
+```
+
+before running `./build.sh`.
+
 Running
 
 ```
