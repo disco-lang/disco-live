@@ -27,6 +27,9 @@ foreign import javascript "wrapper"
 foreign import javascript unsafe "$1.value"
   js_input_value :: JSVal -> IO JSString
 
+foreign import javascript unsafe "$1.value = $2"
+  js_input_set_value :: JSVal -> JSString -> IO ()
+
 foreign import javascript unsafe "$1.key"
   js_event_key :: JSVal -> IO JSString
 
@@ -53,47 +56,55 @@ foreign export javascript "setup" setup :: IO ()
 -- | Main entrypoint.
 setup :: IO ()
 setup = do
-    ref <- initState
+  ref <- initState
 
-    -- Register callback for button click.
-    evalButton <- js_document_getElementById (toJSString "eval")
-    callback <- asEventListener (onEvalButtonClick ref)
-    js_addEventListener evalButton (toJSString "click") callback
+  -- Register callback for button click.
+  evalButton <- js_document_getElementById (toJSString "eval")
+  callback <- asEventListener (onEvalButtonClick ref)
+  js_addEventListener evalButton (toJSString "click") callback
 
-    exprIn <- js_document_getElementById (toJSString "expr")
-    callback <- asEventListener (onExprKeyUp ref)
-    js_addEventListener exprIn (toJSString "keyup") callback
+  exprIn <- js_document_getElementById (toJSString "expr")
+  callback <- asEventListener (onExprKeyUp ref)
+  js_addEventListener exprIn (toJSString "keyup") callback
 
 -- | Handle 'keyup'.
 onExprKeyUp :: RefState -> JSVal -> IO ()
 onExprKeyUp ref event = do
-    key <- js_event_key event
-    when (fromJSString key == "Enter") $ handleEval ref
+  key <- js_event_key event
+  when (fromJSString key == "Enter") $ handleEval ref
 
 -- | Handle button clicks.
 onEvalButtonClick :: RefState -> JSVal -> IO ()
 onEvalButtonClick ref _ = handleEval ref
 
+-- | Clear the REPL entry box.
+clearREPL :: IO ()
+clearREPL = do
+  exprIn <- js_document_getElementById (toJSString "expr")
+  js_input_set_value exprIn (toJSString "")
+
 -- | Handle evaluation request.
 handleEval :: RefState -> IO ()
 handleEval ref = do
-    module_ <- fromJSString <$> js_view_state_doc_toString
-    exprIn  <- js_document_getElementById (toJSString "expr")
-    expr    <- fromJSString <$> js_input_value exprIn
+  module_ <- fromJSString <$> js_view_state_doc_toString
+  exprIn <- js_document_getElementById (toJSString "expr")
+  expr <- fromJSString <$> js_input_value exprIn
 
-    logHistory $ "disco> " <> expr
-    mresult <- loadFile ref module_
-    case mresult of
-      Nothing -> pure ()
-      Just result -> logHistory result
-    result <- eval ref expr
-    logHistory result
+  logHistory $ "disco> " <> expr
+  mresult <- loadFile ref module_
+  case mresult of
+    Nothing -> pure ()
+    Just result -> logHistory result
+  result <- eval ref expr
+  logHistory result
+
+  clearREPL
 
 -- | Put an item in the interpreter history.
 logHistory :: String -> IO ()
 logHistory s = do
-    div <- js_document_getElementById (toJSString "out")
-    pre <- js_document_createElement (toJSString "pre")
-    js_element_appendChild div pre
-    js_element_setInnerHtml pre (toJSString s)
-    js_element_scrollToBottom div
+  div <- js_document_getElementById (toJSString "out")
+  pre <- js_document_createElement (toJSString "pre")
+  js_element_appendChild div pre
+  js_element_setInnerHtml pre (toJSString s)
+  js_element_scrollToBottom div
