@@ -30,6 +30,9 @@ foreign import javascript unsafe "$1.value"
 foreign import javascript unsafe "$1.value = $2"
   js_input_set_value :: JSVal -> JSString -> IO ()
 
+foreign import javascript unsafe "$1.select()"
+  js_input_select :: JSVal -> IO ()
+
 foreign import javascript unsafe "$1.key"
   js_event_key :: JSVal -> IO JSString
 
@@ -83,6 +86,11 @@ clearREPL = do
   exprIn <- js_document_getElementById (toJSString "expr")
   js_input_set_value exprIn (toJSString "")
 
+selectREPL :: IO ()
+selectREPL = do
+  exprIn <- js_document_getElementById (toJSString "expr")
+  js_input_select exprIn
+
 -- | Handle evaluation request.
 handleEval :: RefState -> IO ()
 handleEval ref = do
@@ -98,7 +106,7 @@ handleEval ref = do
   result <- eval ref expr
   logHistory result
 
-  clearREPL
+  selectREPL
 
 -- | Put an item in the interpreter history.
 logHistory :: String -> IO ()
