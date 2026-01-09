@@ -22,6 +22,22 @@
       #name { font-size: 200%;}
       #title img { width: 30px; margin-bottom:-5px;}
 
+      #links {
+          margin-left: 10px;
+          padding: 6px;
+      }
+
+      #links ul {
+          margin: 0;
+          padding: 0;
+          list-style-type: none;
+      }
+
+      #links ul li {
+          display: inline;
+          margin-left: 10px;
+      }
+
       #editor {
         width: 100%;
         resize: scroll;
@@ -61,6 +77,16 @@
     <span id="name">Disco</span>
     <span>&nbsp; Functional programming for discrete math.</span>
   </div>
+  <div id="links">
+    <ul>
+      <li><a href="help.html">Help</a></li>
+      <li><a href="https://disco-lang.readthedocs.io/en/latest/introduction/index.html">Gentle Introduction</a></li>
+      <li><a href="https://disco-lang.readthedocs.io/en/latest/reference/index.html">Language Reference</a></li>
+      <li><a href="https://disco-lang.readthedocs.io/en/latest/reference/errors.html">Error Messages</a></li>
+      <li><a href="https://disco-lang.readthedocs.io/en/latest/reference/symbols.html">Symbols</a></li>
+      <li><a href="https://github.com/disco-lang/disco/blob/main/README.md">GitHub</a></li>
+    </ul>
+  </div>
   <div id="wrap">
     <div id="left">
       <label for="editor">File <code>disco-live.disco</code>:</label>
@@ -80,7 +106,7 @@
     <div id="right">
       <label for="out">Interpreter history:</label>
       <div id="out"></div>
-        <label for="expr">Command:</label>
+        <label for="expr">Input:</label>
         <input type="text" id="expr" value="1 + 2"/>
         <input type="button" id="eval" value="Evaluate (↩︎)"/>
       </div>
