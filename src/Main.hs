@@ -61,14 +61,20 @@ setup :: IO ()
 setup = do
   ref <- initState
 
-  -- Register callback for button click.
+  -- Register callback for Evaluate button click.
   evalButton <- js_document_getElementById (toJSString "eval")
   callback <- asEventListener (onEvalButtonClick ref)
   js_addEventListener evalButton (toJSString "click") callback
 
+  -- Register callback for Enter key in expr entry field.
   exprIn <- js_document_getElementById (toJSString "expr")
   callback <- asEventListener (onExprKeyUp ref)
   js_addEventListener exprIn (toJSString "keyup") callback
+
+  -- Register callback for Clear button click.
+  clearButton <- js_document_getElementById (toJSString "clear")
+  callback <- asEventListener (onClearButtonClick ref)
+  js_addEventListener clearButton (toJSString "click") callback
 
 -- | Handle 'keyup'.
 onExprKeyUp :: RefState -> JSVal -> IO ()
@@ -79,6 +85,9 @@ onExprKeyUp ref event = do
 -- | Handle button clicks.
 onEvalButtonClick :: RefState -> JSVal -> IO ()
 onEvalButtonClick ref _ = handleEval ref
+
+onClearButtonClick :: RefState -> JSVal -> IO ()
+onClearButtonClick ref _ = handleClear ref
 
 -- | Clear the REPL entry box.
 clearREPL :: IO ()
@@ -116,3 +125,9 @@ logHistory s = do
   js_element_appendChild div pre
   js_element_setInnerHtml pre (toJSString s)
   js_element_scrollToBottom div
+
+-- | Clear the history.
+handleClear :: RefState -> IO ()
+handleClear ref = do
+  div <- js_document_getElementById (toJSString "out")
+  js_element_setTextContent div (toJSString "")

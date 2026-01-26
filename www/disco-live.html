@@ -66,6 +66,7 @@
         margin-bottom:6px;
       }
       #eval { width: 100%; }
+      #clear { width: 100%; }
     </style>
 </head>
 
@@ -106,6 +107,7 @@
     <div id="right">
       <label for="out">Interpreter history:</label>
       <div id="out"></div>
+        <input type="button" id="clear" value="Clear History"/>
         <label for="expr">Input:</label>
         <input type="text" id="expr" value="1 + 2"/>
         <input type="button" id="eval" value="Evaluate (↩︎)"/>
